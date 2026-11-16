@@ -4,7 +4,7 @@ A Rust library and command-line tool for the [Datadis](https://datadis.es) API,
 the Spanish platform that gives access to electricity supply and consumption
 data from distributors.
 
-> **Status:** early development (`0.1.0`). The API surface may change.
+> **Status:** early development. The API surface may change.
 
 ## Library
 
