@@ -26,6 +26,12 @@
 pub enum Error {
     AuthenticationError,
     Http(reqwest::Error),
+    /// The API answered with a non-success status. `body` holds the response
+    /// text, which Datadis uses to explain the failure (e.g. `No supplies`).
+    Api {
+        status: reqwest::StatusCode,
+        body: String,
+    },
 }
 
 impl From<reqwest::Error> for Error {
@@ -39,6 +45,7 @@ impl std::fmt::Display for Error {
         match self {
             Error::AuthenticationError => f.write_str("authentication failed"),
             Error::Http(error) => write!(f, "HTTP error: {error}"),
+            Error::Api { status, body } => write!(f, "API error ({status}): {body}"),
         }
     }
 }
@@ -46,7 +53,7 @@ impl std::fmt::Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Error::AuthenticationError => None,
+            Error::AuthenticationError | Error::Api { .. } => None,
             Error::Http(error) => Some(error),
         }
     }

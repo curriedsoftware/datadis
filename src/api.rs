@@ -1268,7 +1268,12 @@ impl Client {
                 retried = true;
                 continue;
             }
-            return Ok(response.error_for_status()?.json().await?);
+            let status = response.status();
+            if !status.is_success() {
+                let body = response.text().await.unwrap_or_default();
+                return Err(Error::Api { status, body });
+            }
+            return Ok(response.json().await?);
         }
     }
 
