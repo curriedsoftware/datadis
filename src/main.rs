@@ -81,7 +81,13 @@ async fn main() {
                         supply.point_type,
                     ]);
                 }
-                table.printstd();
+                if supplies.supplies.is_empty() {
+                    eprintln!(
+                        "Datadis reported no supplies (it sometimes does so spuriously; retry if you expected some)"
+                    );
+                } else {
+                    table.printstd();
+                }
                 if !supplies.distributor_error.is_empty() {
                     eprintln!(
                         "\n⚠ {} distributor(s) returned errors:",
@@ -99,7 +105,7 @@ async fn main() {
                     eprint!("{errors}");
                 }
             }
-            Err(error) => eprintln!("could not list supplies: {error:?}"),
+            Err(error) => eprintln!("could not list supplies: {error}"),
         },
         _ => eprintln!("command not implemented yet"),
     }
