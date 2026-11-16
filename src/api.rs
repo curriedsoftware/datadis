@@ -1290,8 +1290,20 @@ impl Client {
             .await?)
     }
 
+    /// Datadis answers `404` with the body `No supplies` when the account has
+    /// no supply points; that is reported as an empty list, not an error.
     pub async fn supplies(&self, query: SuppliesQuery) -> Result<Supplies> {
-        self.private_get("/get-supplies-v2", &query).await
+        match self.private_get("/get-supplies-v2", &query).await {
+            Err(Error::Api { status, body })
+                if status == StatusCode::NOT_FOUND && body.trim() == "No supplies" =>
+            {
+                Ok(Supplies {
+                    supplies: Vec::new(),
+                    distributor_error: Vec::new(),
+                })
+            }
+            result => result,
+        }
     }
 
     pub async fn contracts(&self, query: ContractsQuery) -> Result<Contracts> {
